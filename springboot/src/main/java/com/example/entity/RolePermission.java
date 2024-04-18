@@ -10,5 +10,6 @@ import lombok.Data;
 public class RolePermission {
 //    @TableId(type = IdType.AUTO)
     private Integer roleId;
+    private Integer adminId;
     private Integer permissionId;}
 

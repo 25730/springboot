@@ -1,7 +1,12 @@
 package com.example.entity;
 
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.TableField;
+import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
+import java.util.Set;
+
+@Component
 /**
  * 管理员
 */
@@ -24,6 +29,17 @@ public class Admin extends Account implements Serializable {
     private String avatar;
     /** 角色标识 */
     private String role;
+
+    @TableField(exist = false)
+    private Set<Permission> permissions;
+
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Set<Permission> permissions) {
+        this.permissions = permissions;
+    }
 
     @Override
     public Integer getId() {

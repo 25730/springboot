@@ -9,7 +9,8 @@ import lombok.Data;
 @Data
 public class Role {
     @TableId(type = IdType.AUTO)
-    private Integer role;
+    private Integer id;
     private String name;
     private String comment;
+
 }
