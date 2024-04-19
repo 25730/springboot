@@ -57,20 +57,20 @@ public class WebController {
         if (RoleEnum.USER.name().equals(account.getRole())) {
             account = userService.login(account);
         }
-        HashSet<Permission> permissionsSet =  new HashSet<>();
-        Integer adminId  = admin.getId();
-       List<AdminRole> adminRoles =  roleMapper.getAdminRoleByAdminId(adminId);
-        List<Permission> permissions = new ArrayList<>();
-        for (AdminRole adminRole : adminRoles){
-            List<RolePermission> rolePermissions = permissionMapper.getRolePermissionByRoleId(adminRole.getRoleId());
-            for (RolePermission rolePermission : rolePermissions){
-               Integer permissionId =  rolePermission.getPermissionId();
-
-             Permission permission =   permissionMapper.selectById(permissionId);
-             permissionsSet.add(permission);
-            }
-        }
-        admin.setPermissions(permissionsSet);
+//        HashSet<Permission> permissionsSet =  new HashSet<>();
+//        Integer adminId  = admin.getId();
+//       List<AdminRole> adminRoles =  roleMapper.getAdminRoleByAdminId(adminId);
+//        List<Permission> permissions = new ArrayList<>();
+//        for (AdminRole adminRole : adminRoles){
+//            List<RolePermission> rolePermissions = permissionMapper.getRolePermissionByRoleId(adminRole.getRoleId());
+//            for (RolePermission rolePermission : rolePermissions){
+//               Integer permissionId =  rolePermission.getPermissionId();
+//
+//             Permission permission =   permissionMapper.selectById(permissionId);
+//             permissionsSet.add(permission);
+//            }
+//        }
+//        admin.setPermissions(permissionsSet);
 
 
         return Result.success(account);

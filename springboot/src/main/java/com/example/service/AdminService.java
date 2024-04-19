@@ -1,13 +1,16 @@
 package com.example.service;
 
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.common.Constants;
+import com.example.common.Result;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
-import com.example.entity.Account;
-import com.example.entity.Admin;
+import com.example.entity.*;
 import com.example.exception.CustomException;
 import com.example.mapper.AdminMapper;
+import com.example.mapper.PermissionMapper;
+import com.example.mapper.RoleMapper;
 import com.example.utils.TokenUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -15,7 +18,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+
 
 /**
  * 管理员业务处理
@@ -25,6 +31,15 @@ public class AdminService {
 
     @Resource
     private AdminMapper adminMapper;
+
+    @Resource
+    RoleMapper roleMapper;
+    @Resource
+    Admin admin;
+    @Resource
+    Account account;
+    @Resource
+    PermissionMapper permissionMapper;
 
     /**
      * 新增
@@ -101,6 +116,29 @@ public class AdminService {
         if (!account.getPassword().equals(dbAdmin.getPassword())) {
             throw new CustomException(ResultCodeEnum.USER_ACCOUNT_ERROR);
         }
+        QueryWrapper<Admin> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", account.getUsername());
+        queryWrapper.eq("password", account.getPassword());
+        Admin res = adminMapper.selectOneByUsernameAndPassword(account.getUsername(), account.getPassword());
+
+
+
+
+        HashSet<Permission> permissionsSet =  new HashSet<>();
+        Integer adminId  = res.getId();
+       List<AdminRole> adminRoles =  roleMapper.getAdminRoleByAdminId(adminId);
+        List<Permission> permissions = new ArrayList<>();
+        for (AdminRole adminRole : adminRoles){
+            List<RolePermission> rolePermissions = permissionMapper.getRolePermissionByRoleId(adminRole.getRoleId());
+            for (RolePermission rolePermission : rolePermissions){
+               Integer permissionId =  rolePermission.getPermissionId();
+
+             Permission permission =   permissionMapper.selectById(permissionId);
+             permissionsSet.add(permission);
+            }
+        }
+        res.setPermissions(permissionsSet);
+
         // 生成token
         String tokenData = dbAdmin.getId() + "-" + RoleEnum.ADMIN.name();
         String token = TokenUtils.createToken(tokenData, dbAdmin.getPassword());

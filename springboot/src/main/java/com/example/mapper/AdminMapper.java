@@ -1,6 +1,8 @@
 package com.example.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.entity.Admin;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -37,4 +39,12 @@ public interface AdminMapper {
 
     @Select("select * from admin where username = #{username}")
     Admin selectByUsername(String username);
+
+
+    @Select("select * from admin where id = #{id}")
+    Admin selectOne(QueryWrapper<Admin> queryWrapper);
+
+    @Select("select * from admin where username = #{username} and password = #{password}")
+    Admin selectOneByUsernameAndPassword(@Param("username") String username, @Param("password") String password);
+
 }

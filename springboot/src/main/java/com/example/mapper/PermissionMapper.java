@@ -11,6 +11,11 @@ public interface PermissionMapper extends BaseMapper<Permission> {
 
 
 
+
+    Permission selectById(Integer id);
+
     @Select("select * from role_permission where role_id = #{roleId}")
     List<RolePermission>getRolePermissionByRoleId(Integer roleId);
+
+
 }
