@@ -1,14 +1,18 @@
 package com.example.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.example.common.Constants;
 import com.example.common.enums.LevelEnum;
 import com.example.common.enums.ResultCodeEnum;
+import com.example.entity.Account;
 import com.example.entity.User;
 import com.example.exception.CustomException;
 import com.example.mapper.UserMapper;
+import com.example.utils.TokenUtils;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import com.example.common.enums.RoleEnum;
 
@@ -21,6 +25,8 @@ public class UserService {
 
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private Account account;
 
     public void add(User user) {
         // 业务逻辑
@@ -31,9 +37,9 @@ public class UserService {
         if (ObjectUtil.isEmpty(user.getPassword())) {
             user.setPassword(Constants.USER_DEFAULT_PASSWORD);
         }
-//        if (ObjectUtil.isEmpty(user.getLevel())) {
-//            user.getLevel(LevelEnum.ORDINARY);
-//        }
+        if (ObjectUtil.isEmpty(user.getLevel())) {
+            user.setLevel(LevelEnum.ORDINARY.level);
+        }
         if (ObjectUtil.isEmpty(user.getName())) {
             user.setName(user.getUsername());
         }
@@ -86,5 +92,43 @@ public class UserService {
         List<User> list = userMapper.selectAll(user);
         return PageInfo.of(list);
     }
-
+    /**
+     * 登录
+     */
+    public Account login(Account account) {
+        Account dbAdmin = userMapper.selectByUsername(account.getUsername());
+        if (ObjectUtil.isNull(dbAdmin)) {
+            throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
+        }
+        if (!account.getPassword().equals(dbAdmin.getPassword())) {
+            throw new CustomException(ResultCodeEnum.USER_ACCOUNT_ERROR);
+        }
+        // 生成token
+        String tokenData = dbAdmin.getId() + "-" + RoleEnum.USER.name();
+        String token = TokenUtils.createToken(tokenData, dbAdmin.getPassword());
+        dbAdmin.setToken(token);
+        return dbAdmin;
+    }
+    /**
+     * 注册
+     */
+    public void register(Account account){
+        User user = new User();
+        BeanUtil.copyProperties(account,user);
+        add(user);
+    }
+    /**
+     * 修改密码
+     */
+    public void updatePassword(Account account) {
+        User dbUser = userMapper.selectByUsername(account.getUsername());
+        if (ObjectUtil.isNull(dbUser)) {
+            throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
+        }
+        if (!account.getPassword().equals(dbUser.getPassword())) {
+            throw new CustomException(ResultCodeEnum.PARAM_PASSWORD_ERROR);
+        }
+        dbUser.setPassword(account.getNewPassword());
+        userMapper.updateById(dbUser);
+    }
 }

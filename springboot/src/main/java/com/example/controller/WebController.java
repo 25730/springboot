@@ -9,6 +9,7 @@ import com.example.entity.*;
 import com.example.mapper.PermissionMapper;
 import com.example.mapper.RoleMapper;
 import com.example.service.AdminService;
+import com.example.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -25,6 +26,8 @@ public class WebController {
 
     @Resource
     private AdminService adminService;
+    @Resource
+    private UserService userService;
     @Resource
     RoleMapper roleMapper;
     @Resource
@@ -50,6 +53,9 @@ public class WebController {
         }
         if (RoleEnum.ADMIN.name().equals(account.getRole())) {
             account = adminService.login(account);
+        }
+        if (RoleEnum.USER.name().equals(account.getRole())) {
+            account = userService.login(account);
         }
         HashSet<Permission> permissionsSet =  new HashSet<>();
         Integer adminId  = admin.getId();
@@ -79,9 +85,10 @@ public class WebController {
                 || ObjectUtil.isEmpty(account.getRole())) {
             return Result.error(ResultCodeEnum.PARAM_LOST_ERROR);
         }
-        if (RoleEnum.ADMIN.name().equals(account.getRole())) {
-            adminService.register(account);
-        }
+//        if (RoleEnum.ADMIN.name().equals(account.getRole())) {
+//            adminService.register(account);
+//        }
+        userService.register(account);//只能注册普通用户
         return Result.success();
     }
 
@@ -96,6 +103,9 @@ public class WebController {
         }
         if (RoleEnum.ADMIN.name().equals(account.getRole())) {
             adminService.updatePassword(account);
+        }
+        if (RoleEnum.USER.name().equals(account.getRole())) {
+            userService.updatePassword(account);
         }
         return Result.success();
     }

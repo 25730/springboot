@@ -1,5 +1,11 @@
 package com.example.common.enums;
 
 public enum LevelEnum {
-    ORDINARY,
+    ORDINARY("普通户"),
+    POOR("贫困户"),
+    ;
+    public String level;
+    LevelEnum(String level){
+        this.level = level;
+    }
 }
