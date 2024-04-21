@@ -4,7 +4,7 @@ np<template>
     <div class="manager-header">
       <div class="manager-header-left">
         <img src="@/assets/imgs/logo.png" />
-        <div class="title">助农扶贫网</div>
+        <div class="title" >助农扶贫网</div>
       </div>
 
       <div class="manager-header-center">
@@ -89,7 +89,7 @@ export default {
     logout() {
       localStorage.removeItem('xm-user')
       this.$router.push('/login')
-    }
+    },
   }
 }
 </script>
