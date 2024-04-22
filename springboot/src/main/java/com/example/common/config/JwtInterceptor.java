@@ -60,6 +60,7 @@ public class JwtInterceptor implements HandlerInterceptor {
                 account = userService.selectById(Integer.valueOf(userId));
             }
         } catch (Exception e) {
+            log.error("Exception occurred while decoding JWT token: {}", e.getMessage());
             throw new CustomException(ResultCodeEnum.TOKEN_CHECK_ERROR);
         }
         if (ObjectUtil.isNull(account)) {
@@ -70,6 +71,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(account.getPassword())).build();
             jwtVerifier.verify(token); // 验证token
         } catch (JWTVerificationException e) {
+            log.error("JWT token verification failed: {}", e.getMessage());
             throw new CustomException(ResultCodeEnum.TOKEN_CHECK_ERROR);
         }
         return true;
